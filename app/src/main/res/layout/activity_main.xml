@@ -23,8 +23,8 @@
         android:text="Load Url"
         android:layout_height="wrap_content" />
 
-<!--    <WebView-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:id="@+id/webview"-->
-<!--        android:layout_height="match_parent"></WebView>-->
+    <WebView
+        android:layout_width="match_parent"
+        android:id="@+id/webview"
+        android:layout_height="match_parent"></WebView>
 </LinearLayout>
