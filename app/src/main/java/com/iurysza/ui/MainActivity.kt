@@ -10,6 +10,8 @@ import com.google.android.material.textfield.TextInputEditText
 import com.iurysza.CustomWebViewClient
 import com.iurysza.R
 import com.iurysza.proxy.CustomProxyController
+import com.iurysza.proxy.WebViewProxy
+import com.iurysza.proxy.WebViewProxyConfig
 
 class MainActivity : AppCompatActivity() {
     private val urlInputText by lazy { findViewById<TextInputEditText>(R.id.textUrl) }
@@ -22,8 +24,9 @@ class MainActivity : AppCompatActivity() {
 
         webView.loadUrl("https://www.google.com")
         loadUrlBtn.setOnClickListener {
-            Log.e(TAG, urlInputText.text.toString())
-            webView.loadUrl(urlInputText.text.toString())
+            val url = urlInputText.text.toString()
+            Log.e(TAG, url)
+            webView.loadUrl("https://$url")
         }
     }
 
@@ -31,7 +34,15 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun WebView.setupWebview(): WebView = apply {
-        val proxyController = CustomProxyController()
+        val proxyController = CustomProxyController(
+            WebViewProxy(
+                applicationContext,
+                config = WebViewProxyConfig(
+                    enabled = true,
+                    forHosts = listOf("www.google.com")
+                ),
+            ),
+        )
         webViewClient = CustomWebViewClient(proxyController)
         settings.javaScriptEnabled = true
         settings.domStorageEnabled = true

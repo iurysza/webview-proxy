@@ -1,8 +1,7 @@
-package com.iurysza.proxy
+package com.iurysza.proxy.util
 
 import java.io.OutputStream
 import java.net.InetAddress
-
 
 object ProxyUtils {
     private const val CONNECTION_OK = "HTTP/1.1 200 Connection Established"

@@ -1,6 +1,6 @@
 package com.iurysza.proxy.certificate
 
-import com.iurysza.proxy.ProxyUtils
+import com.iurysza.proxy.util.ProxyUtils
 
 class WCCertificateRegistry {
     companion object {

@@ -1,7 +1,6 @@
-package com.iurysza.proxy
+package com.iurysza.proxy.util
 
 import java.io.InputStream
-
 
 object RequestParser {
     data class RequestLine(var action: String?, var uri: String?)

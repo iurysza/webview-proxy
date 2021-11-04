@@ -1,18 +1,18 @@
 package com.iurysza.proxy.certificate
 
-import java.math.BigInteger
-import java.security.KeyPair
-import java.security.KeyPairGenerator
-import java.security.Provider
-import java.security.SecureRandom
-import java.security.cert.X509Certificate
-import java.util.Date
 import org.spongycastle.asn1.x500.X500Name
 import org.spongycastle.asn1.x509.SubjectPublicKeyInfo
 import org.spongycastle.cert.X509v3CertificateBuilder
 import org.spongycastle.cert.jcajce.JcaX509CertificateConverter
 import org.spongycastle.jce.provider.BouncyCastleProvider
 import org.spongycastle.operator.jcajce.JcaContentSignerBuilder
+import java.math.BigInteger
+import java.security.KeyPair
+import java.security.KeyPairGenerator
+import java.security.Provider
+import java.security.SecureRandom
+import java.security.cert.X509Certificate
+import java.util.*
 
 class WCCertificate {
     lateinit var cert: X509Certificate

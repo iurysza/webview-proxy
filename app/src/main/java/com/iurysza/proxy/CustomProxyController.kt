@@ -1,59 +1,41 @@
 package com.iurysza.proxy
 
-import java.util.concurrent.Executor
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
-import android.webkit.WebResourceRequest
-import androidx.webkit.ProxyConfig
-import androidx.webkit.ProxyController
-import androidx.webkit.WebViewFeature
-import com.iurysza.proxy.ProxyServer.Companion.TAG
+import android.net.http.SslError
+import com.iurysza.proxy.certificate.WCCertificateRegistry
 
-class CustomProxyController {
-    private var proxyServer: ProxyServer? = null
+class CustomProxyController(
+    private val webViewProxy: WebViewProxy,
+    private val wcCertificate: WCCertificateRegistry.Companion = WCCertificateRegistry.Companion
+) {
+    private val bannedList: List<String> = emptyList()
 
-
-    companion object {
-        private val PROXY_CHANGE_EXECUTOR = object : Executor {
-            private val handler = Handler(Looper.getMainLooper())
-            override fun execute(r: Runnable) {
-                Log.e(TAG, "execute: runnable")
-                handler.post(r)
+    fun startProxyIfNeeded(host: String?): Boolean {
+        host ?: return false
+//        if (host == null || !shouldProxyHost(host)) return false
+        webViewProxy.start()
+        if (wcCertificate.getCert(host) != null) {
+            synchronized(this) {
+                wcCertificate.putCert(
+                    host,
+                    wcCertificate.createCertificate(host)
+                )
             }
         }
-        private val PROXY_CHANGE_LISTENER = Runnable {}
-
+        return true
     }
 
-    fun applyProxyIfNeed(request: WebResourceRequest?) {
-        if (request?.isForMainFrame != true) return
-
-        runCatching {
-            proxyServer = ProxyServer().apply {
-                startServer()
-                setProxy(proxyHost, proxyPort)
+    fun checkSslError(error: SslError, onIgnoreError: () -> Unit) {
+        val certProps = error.certificate.issuedTo.cName.split(";")
+        if (certProps.size > 1) {
+            val issuedTo = certProps[0]
+            val checkRandom = certProps[1]
+            if (wcCertificate.checkIfTrusted(issuedTo, checkRandom)) {
+                onIgnoreError()
+                return
             }
-        }.onFailure {
-            Log.e(TAG, "applyProxyIfNeed: ", it)
-        }.onSuccess {
-            Log.e(TAG, "applyProxyIfNeed: applied", )
         }
     }
 
-    private fun setProxy(host: String, port: Int) {
-        if (WebViewFeature.isFeatureSupported(WebViewFeature.PROXY_OVERRIDE)) {
-            val proxyConfig = ProxyConfig.Builder()
-                .apply {
-                    addProxyRule(
-                        "$host:$port",
-                        ProxyConfig.MATCH_HTTPS
-                    )
-                }
-                .build()
-            ProxyController
-                .getInstance()
-                .setProxyOverride(proxyConfig, PROXY_CHANGE_EXECUTOR, PROXY_CHANGE_LISTENER)
-        }
-    }
+    private fun shouldProxyHost(host: String): Boolean = host in bannedList
+
 }
